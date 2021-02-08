@@ -1,5 +1,4 @@
 let mongoose = require("mongoose")
-const { collection } = require("./User")
 const {
     Schema
 } = mongoose

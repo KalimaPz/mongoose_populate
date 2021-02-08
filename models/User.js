@@ -7,7 +7,8 @@ const {
 let UserSchema = new Schema({
     _id: Schema.Types.ObjectId,
     owned_farm: [{
-        type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        ref : "Farm"
     }],
     name: String,
     user_id: String,

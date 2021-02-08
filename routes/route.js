@@ -37,4 +37,30 @@ app.get('/getAllHouse', async (req, res) => {
     }
 })
 
+app.get('/getUser', async (req, res) => {
+    try {
+        joinFarmWithOwner("Donnukrit", res)
+
+
+    } catch (err) {
+        // next(err)
+    }
+})
+
+joinFarmWithOwner = async (username, res) => {
+    User.findOne({
+            name: username
+        })
+        .populate({
+            path : "owned_farm",
+            model: Farm,
+            populate : {
+                path : "houses",
+                model : House
+            }
+        }).exec((err, owned_farm) => {
+            res.json(owned_farm)
+        })
+}
+
 module.exports = app;

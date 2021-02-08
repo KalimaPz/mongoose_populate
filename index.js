@@ -1,4 +1,5 @@
-const connectString = `mongodb://cloudfarm:DBcloudfarm@cloudfarm-shard-00-00.a1pfl.mongodb.net:27017,cloudfarm-shard-00-01.a1pfl.mongodb.net:27017,cloudfarm-shard-00-02.a1pfl.mongodb.net:27017/farm?authSource=admin&replicaSet=atlas-okz414-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true`
+require('dotenv').config()
+const connectString = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@cloudfarm-shard-00-00.a1pfl.mongodb.net:27017,cloudfarm-shard-00-01.a1pfl.mongodb.net:27017,cloudfarm-shard-00-02.a1pfl.mongodb.net:27017/farm?authSource=admin&replicaSet=atlas-okz414-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true`
 const express = require("express")
 const mongoose = require("mongoose")
 const route = require('./routes/route')

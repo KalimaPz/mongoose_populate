@@ -14,7 +14,8 @@ let FarmSchema = new Schema({
     owner: String,
     staffs: [String],
     houses: [{
-        type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        ref : 'House'
     }],
 }, {
     collection: "farm"
