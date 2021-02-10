@@ -3,6 +3,7 @@ const User = require('../models/User')
 const Farm = require('../models/Farm')
 const House = require('../models/House')
 const app = express()
+
 app.get('/getUserById/:id', (req, res) => {
     let id = req.params.id
     try {
@@ -10,6 +11,7 @@ app.get('/getUserById/:id', (req, res) => {
             user_id: id
         }).then((result) => {
             if (result == null) {
+                console.log('mismatch params')
                 res.json({
                     msg: false,
                     data: "Null"
@@ -33,16 +35,26 @@ app.get('/getFarmByUserId/:user_id', (req, res) => {
     try {
         User.findOne({
             user_id: user_id
-        }).lean().populate({
+        }).populate({
             path: "owned_farm",
             model: Farm,
 
-        }).exec((err, farm) => {
-            // console.log(err)
-            res.json(farm.owned_farm)
+        }).then((result) => {
+            if (result == null) {
+                console.log('mismatch params')
+                res.json({
+                    msg: false,
+                    data: null
+                })
+            } else {
+                res.json({
+                    msg: true,
+                    data: result.owned_farm
+                })
+            }
         })
     } catch (err) {
-        console.log(err)
+        res.status(404)
         res.json({
             msg: false,
             data: "Null"
@@ -58,29 +70,23 @@ app.get('/getHouseByFarmId/:farm_id', (req, res) => {
         }).populate({
             path: "houses",
             model: House
-        }).exec((err, owned_house) => {
-            res.json(owned_house.houses)
+        }).then((result) => {
+            if (result == null) {
+                console.log('mismatch params')
+                res.json({
+                    msg: false,
+                    data: null
+                })
+            } else {
+                res.json({
+                    msg: true,
+                    data: owned_house.houses,
+                })
+            }
         })
     } catch (err) {
         console.log(err)
     }
 })
-
-joinFarmWithOwner = async (username, res) => {
-    User.findOne({
-            name: username
-        })
-        .populate({
-            path: "owned_farm",
-            model: Farm,
-            populate: {
-                path: "houses",
-                select: "house",
-                model: House
-            }
-        }).exec((err, owned_farm) => {
-            res.json(owned_farm)
-        })
-}
 
 module.exports = app;
