@@ -3,47 +3,66 @@ const User = require('../models/User')
 const Farm = require('../models/Farm')
 const House = require('../models/House')
 const app = express()
-
-app.get('/getAllUser', async (req, res) => {
+app.get('/getUserById/:id', (req, res) => {
+    let id = req.params.id
     try {
-        await User.find({}).then((result) => {
-            console.log(result)
-            res.json(result)
+        User.findOne({
+            user_id: id
+        }).then((result) => {
+            if (result == null) {
+                res.json({
+                    msg: false,
+                    data: "Null"
+                })
+            } else {
+                res.json({
+                    msg: true,
+                    data: result
+                })
+            }
         })
     } catch (err) {
-        next(err)
+        console.log(err)
+        res.json({
+            msg: false
+        })
+    }
+})
+app.get('/getFarmByUserId/:user_id', (req, res) => {
+    let user_id = req.params.user_id
+    try {
+        User.findOne({
+            user_id: user_id
+        }).lean().populate({
+            path: "owned_farm",
+            model: Farm,
+
+        }).exec((err, farm) => {
+            // console.log(err)
+            res.json(farm.owned_farm)
+        })
+    } catch (err) {
+        console.log(err)
+        res.json({
+            msg: false,
+            data: "Null"
+        })
     }
 })
 
-app.get('/getAllFarm', async (req, res) => {
+app.get('/getHouseByFarmId/:farm_id', (req, res) => {
+    let farm_id = req.params.farm_id
     try {
-        await Farm.find({}).then((result) => {
-            console.log(result)
-            res.json(result)
+        Farm.findOne({
+            farm_id: farm_id
+        }).populate({
+            path: "houses",
+            model: House
+        }).exec((err, owned_house) => {
+            res.json(owned_house.houses)
         })
     } catch (err) {
-        next(err)
-    }
-})
-
-app.get('/getAllHouse', async (req, res) => {
-    try {
-        await House.find({}).then((result) => {
-            console.log(result)
-            res.json(result)
-        })
-    } catch (err) {
-        next(err)
-    }
-})
-
-app.get('/getUser', async (req, res) => {
-    try {
-        joinFarmWithOwner("Donnukrit", res)
-
-
-    } catch (err) {
-        // next(err)
+        console.log(err)
     }
 })
 
@@ -52,11 +71,12 @@ joinFarmWithOwner = async (username, res) => {
             name: username
         })
         .populate({
-            path : "owned_farm",
+            path: "owned_farm",
             model: Farm,
-            populate : {
-                path : "houses",
-                model : House
+            populate: {
+                path: "houses",
+                select: "house",
+                model: House
             }
         }).exec((err, owned_farm) => {
             res.json(owned_farm)
